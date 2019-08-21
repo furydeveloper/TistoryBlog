@@ -10,9 +10,8 @@ import UIKit
 
 class LoginViewController: UIViewController {
   
-  private let loginButton: UIButton = {
-    let button = UIButton(type: .system)
-    button.setTitle("test", for: .normal)
+  private let loginButton: KOLoginButton = {
+    let button = KOLoginButton()
     button.addTarget(self, action: #selector(touchUpLoginButton(_:)), for: .touchUpInside)
     button.translatesAutoresizingMaskIntoConstraints = false
     return button
@@ -33,24 +32,17 @@ class LoginViewController: UIViewController {
       session.close()
     }
     
-    KOSessionTask.userMeTask { (error, me) in
-      print("nicname :", me?.nickname)
-      print("email :", me?.account)
+    session.open { (error) in
+      if error != nil || !session.isOpen() { return }
+      KOSessionTask.userMeTask(completion: { (error, user) in
+        guard let user = user,
+              let email = user.account?.email,
+              let nicname = user.nickname else { return }
+        
+        print("eamil :", email)
+        print("nicname :", nicname)
+      })
     }
-    
-    session.open(completionHandler: { (error) -> Void in
-      
-      if !session.isOpen() {
-        if let error = error as NSError? {
-          switch error.code {
-          case Int(KOErrorCancelled.rawValue):
-            break
-          default:
-            print("\(error.description)")
-          }
-        }
-      }
-    })
   }
 
   private func layout() {
@@ -60,6 +52,7 @@ class LoginViewController: UIViewController {
     loginButton.leadingAnchor.constraint(equalTo: guide.leadingAnchor, constant: 20).isActive = true
     loginButton.trailingAnchor.constraint(equalTo: guide.trailingAnchor, constant: -20).isActive = true
     loginButton.bottomAnchor.constraint(equalTo: guide.bottomAnchor, constant: -30).isActive = true
+    loginButton.heightAnchor.constraint(equalToConstant: 50).isActive = true
   }
 
 }
