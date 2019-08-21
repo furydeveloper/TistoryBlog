@@ -37,10 +37,13 @@ class LoginViewController: UIViewController {
       KOSessionTask.userMeTask(completion: { (error, user) in
         guard let user = user,
               let email = user.account?.email,
-              let nicname = user.nickname else { return }
+              let nickname = user.nickname else { return }
         
-        print("eamil :", email)
-        print("nicname :", nicname)
+        let mainVC = MainViewController()
+        mainVC.emailLabel.text = email
+        mainVC.nicnameLabel.text = nickname
+        
+        self.present(mainVC, animated: false, completion: nil)
       })
     }
   }
@@ -54,6 +57,5 @@ class LoginViewController: UIViewController {
     loginButton.bottomAnchor.constraint(equalTo: guide.bottomAnchor, constant: -30).isActive = true
     loginButton.heightAnchor.constraint(equalToConstant: 50).isActive = true
   }
-
 }
 
